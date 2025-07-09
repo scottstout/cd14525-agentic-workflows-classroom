@@ -6,7 +6,7 @@ import json
 
 # Load API key from .env file
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url = "https://openai.vocareum.com/v1")
 
 class FitnessUser:
     """Represents a fitness app user."""
@@ -36,14 +36,15 @@ def deterministic_agent(user: FitnessUser) -> Dict:
     """
     Implement your logic here to generate:
     {
-        "weekly_schedule": {
-            "Monday": {"type": "strength training", "duration": 45, "intensity": "moderate", "description": "..."},
+        "weekly_schedule": {{
+            "Monday": {{"type": "strength training", "duration": 45, "intensity": "moderate", "description": "..."}},
             ...
         }
     }
     """
-    # Your code goes here
-    pass
+    monday = {"type": "strength training", "duration": 45, "intensity": "moderate", "description": "standard monday workout"}
+    thursday = {"type": "cardio training", "duration": 45, "intensity": "moderate", "description": "standard thursday workout"}
+    return {"weekly_schedule":{"Monday": monday}, "Thursday": thursday}
 
 
 # ======== AGENT 2 — LLM-Based Planner ========
@@ -65,9 +66,19 @@ def llm_agent(user: FitnessUser) -> Dict:
     - Preferences: {preferences_text}
     - Limitations: {limitations_text}
 
+    The workout plan should take into consideration the client age and fitness level. Less fit clients should work out less frequently and with lower intensity. Older clients should use less intensity. 
+    The plan should take into account their goals, preferences and limitations.
+    The description should provide a short summary of the plan and how you arrived at this plan for this client. This description will be displayed to the client so word it accordingly.
+
     # TODO: Add prompt instructions here to guide the LLM:
     # What should it focus on? How should it present the plan?
     # What format should the response follow?
+    The response should follow the format shown in the example that follows. Note that all fields must be supplied for each day in the schedule.
+        {{
+            "weekly_schedule": {{
+                "Monday": {{"type": "strength training", "duration": 45, "intensity": "moderate", "description": "..."}}
+            }}
+        }}
     """
 
     try:
@@ -80,6 +91,7 @@ def llm_agent(user: FitnessUser) -> Dict:
             temperature=0.2,
         )
         result_text = response.choices[0].message.content
+        print(result_text)
         return json.loads(result_text)
 
     except Exception as e:
