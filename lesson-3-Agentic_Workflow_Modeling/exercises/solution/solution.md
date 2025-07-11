@@ -1,3 +1,5 @@
+
+```mermaid
 flowchart TD
     Start[Start] --> StrategicAgent[StrategicAgent: Manage Aid Request]
 
@@ -21,3 +23,4 @@ flowchart TD
 
     DispatchAgent --> Confirm[StrategicAgent: Confirm Delivery]
     Confirm --> End[End]
+```
